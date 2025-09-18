@@ -69,18 +69,21 @@ export default function CryptoTools() {
           {filteredTools.map((tool) => (
             <div key={tool.id} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-4">
-                <div className="bg-blue-100 p-3 rounded-lg text-2xl">
-                  {tool.icon}
+                <div className="bg-blue-100 p-3 rounded-lg">
+                  <img 
+                    src={tool.iconUrl} 
+                    alt={tool.name}
+                    className="w-8 h-8"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://via.placeholder.com/32x32/3B82F6/FFFFFF?text=' + tool.name.charAt(0);
+                    }}
+                  />
                 </div>
                 <div className="flex items-center space-x-2">
                   {tool.premium && (
                     <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs px-2 py-1 rounded-full font-medium">
                       PRO
-                    </span>
-                  )}
-                  {tool.commission && (
-                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
-                      ${tool.commission} Commission
                     </span>
                   )}
                 </div>

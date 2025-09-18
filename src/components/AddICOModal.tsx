@@ -19,7 +19,7 @@ export default function AddICOModal({ onClose }: AddICOModalProps) {
     participants: 0,
     rating: 4.0,
     category: 'DeFi',
-    logo: '🚀',
+    iconUrl: '',
     status: 'upcoming' as 'upcoming' | 'active' | 'completed',
     website: '',
     whitepaper: '',
@@ -131,12 +131,13 @@ export default function AddICOModal({ onClose }: AddICOModalProps) {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Logo (Emoji)
+                Icon URL
               </label>
               <input
-                type="text"
-                value={formData.logo}
-                onChange={(e) => setFormData(prev => ({ ...prev, logo: e.target.value }))}
+                type="url"
+                placeholder="https://example.com/logo.png"
+                value={formData.iconUrl}
+                onChange={(e) => setFormData(prev => ({ ...prev, iconUrl: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>

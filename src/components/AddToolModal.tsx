@@ -12,7 +12,7 @@ export default function AddToolModal({ onClose }: AddToolModalProps) {
     name: '',
     description: '',
     category: 'Trading',
-    icon: '🔧',
+    iconUrl: '',
     premium: false,
     rating: 4.0,
     url: '',
@@ -112,12 +112,13 @@ export default function AddToolModal({ onClose }: AddToolModalProps) {
           <div className="grid md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Icon (Emoji)
+                Icon URL
               </label>
               <input
-                type="text"
-                value={formData.icon}
-                onChange={(e) => setFormData(prev => ({ ...prev, icon: e.target.value }))}
+                type="url"
+                placeholder="https://example.com/favicon.ico"
+                value={formData.iconUrl}
+                onChange={(e) => setFormData(prev => ({ ...prev, iconUrl: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -132,18 +133,6 @@ export default function AddToolModal({ onClose }: AddToolModalProps) {
                 step="0.1"
                 value={formData.rating}
                 onChange={(e) => setFormData(prev => ({ ...prev, rating: parseFloat(e.target.value) }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Commission ($)
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={formData.commission}
-                onChange={(e) => setFormData(prev => ({ ...prev, commission: parseInt(e.target.value) }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>

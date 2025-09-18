@@ -10,20 +10,22 @@ export default function AddPropFirmModal({ onClose }: AddPropFirmModalProps) {
   const { addPropFirm } = useData();
   const [formData, setFormData] = useState({
     name: '',
-    logo: '💼',
+    iconUrl: '',
     description: '',
     minCapital: '',
     maxCapital: '',
     profitSplit: '',
-    monthlyTarget: '',
+    maxDrawdown: '',
+    tradingPeriod: '',
     challenge: true,
     instruments: ['Forex'],
     rating: 4.0,
     reviews: 0,
     features: [''],
+    offers: [''],
+    highlights: [''],
     website: '',
     affiliateUrl: '',
-    commission: 0,
   });
 
   const availableInstruments = ['Forex', 'Indices', 'Commodities', 'Crypto', 'Stocks', 'Futures'];
@@ -33,9 +35,10 @@ export default function AddPropFirmModal({ onClose }: AddPropFirmModalProps) {
     const firmData = {
       ...formData,
       features: formData.features.filter(f => f.trim() !== ''),
+      offers: formData.offers.filter(f => f.trim() !== ''),
+      highlights: formData.highlights.filter(f => f.trim() !== ''),
       website: formData.website || undefined,
       affiliateUrl: formData.affiliateUrl || undefined,
-      commission: formData.commission || undefined,
     };
     addPropFirm(firmData);
     onClose();
@@ -59,6 +62,48 @@ export default function AddPropFirmModal({ onClose }: AddPropFirmModalProps) {
     setFormData(prev => ({
       ...prev,
       features: prev.features.filter((_, i) => i !== index)
+    }));
+  };
+
+  const addOffer = () => {
+    setFormData(prev => ({
+      ...prev,
+      offers: [...prev.offers, '']
+    }));
+  };
+
+  const updateOffer = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      offers: prev.offers.map((f, i) => i === index ? value : f)
+    }));
+  };
+
+  const removeOffer = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      offers: prev.offers.filter((_, i) => i !== index)
+    }));
+  };
+
+  const addHighlight = () => {
+    setFormData(prev => ({
+      ...prev,
+      highlights: [...prev.highlights, '']
+    }));
+  };
+
+  const updateHighlight = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      highlights: prev.highlights.map((f, i) => i === index ? value : f)
+    }));
+  };
+
+  const removeHighlight = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      highlights: prev.highlights.filter((_, i) => i !== index)
     }));
   };
 
@@ -97,26 +142,40 @@ export default function AddPropFirmModal({ onClose }: AddPropFirmModalProps) {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Logo (Emoji)
+                Icon URL
               </label>
               <input
-                type="text"
-                value={formData.logo}
-                onChange={(e) => setFormData(prev => ({ ...prev, logo: e.target.value }))}
+                type="url"
+                placeholder="https://example.com/favicon.ico"
+                value={formData.iconUrl}
+                onChange={(e) => setFormData(prev => ({ ...prev, iconUrl: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+               Max Drawdown
               Description
             </label>
             <textarea
               required
-              rows={3}
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              placeholder="10%"
+              value={formData.maxDrawdown}
+              onChange={(e) => setFormData(prev => ({ ...prev, maxDrawdown: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Trading Period
+            </label>
+            <input
+              type="text"
+              required
+              placeholder="30 days"
+              value={formData.tradingPeriod}
+              onChange={(e) => setFormData(prev => ({ ...prev, tradingPeriod: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -179,7 +238,7 @@ export default function AddPropFirmModal({ onClose }: AddPropFirmModalProps) {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Rating
@@ -203,18 +262,6 @@ export default function AddPropFirmModal({ onClose }: AddPropFirmModalProps) {
                 min="0"
                 value={formData.reviews}
                 onChange={(e) => setFormData(prev => ({ ...prev, reviews: parseInt(e.target.value) }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Commission ($)
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={formData.commission}
-                onChange={(e) => setFormData(prev => ({ ...prev, commission: parseInt(e.target.value) }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -304,6 +351,68 @@ export default function AddPropFirmModal({ onClose }: AddPropFirmModalProps) {
               className="text-blue-600 hover:text-blue-800 text-sm"
             >
               + Add Feature
+            </button>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Special Offers
+            </label>
+            {formData.offers.map((offer, index) => (
+              <div key={index} className="flex gap-2 mb-2">
+                <input
+                  type="text"
+                  value={offer}
+                  onChange={(e) => updateOffer(index, e.target.value)}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter special offer"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeOffer(index)}
+                  className="px-3 py-2 text-red-600 hover:text-red-800"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addOffer}
+              className="text-blue-600 hover:text-blue-800 text-sm"
+            >
+              + Add Offer
+            </button>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Highlights
+            </label>
+            {formData.highlights.map((highlight, index) => (
+              <div key={index} className="flex gap-2 mb-2">
+                <input
+                  type="text"
+                  value={highlight}
+                  onChange={(e) => updateHighlight(index, e.target.value)}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter highlight"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeHighlight(index)}
+                  className="px-3 py-2 text-red-600 hover:text-red-800"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addHighlight}
+              className="text-blue-600 hover:text-blue-800 text-sm"
+            >
+              + Add Highlight
             </button>
           </div>
 

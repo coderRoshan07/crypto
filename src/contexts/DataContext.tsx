@@ -5,12 +5,11 @@ export interface CryptoTool {
   name: string;
   description: string;
   category: string;
-  icon: string;
+  iconUrl: string;
   premium: boolean;
   rating: number;
   url: string;
   affiliateUrl?: string;
-  commission?: number;
   features: string[];
 }
 
@@ -26,7 +25,7 @@ export interface ICOProject {
   participants: number;
   rating: number;
   category: string;
-  logo: string;
+  iconUrl: string;
   status: 'upcoming' | 'active' | 'completed';
   website?: string;
   whitepaper?: string;
@@ -40,20 +39,22 @@ export interface ICOProject {
 export interface PropFirm {
   id: string;
   name: string;
-  logo: string;
+  iconUrl: string;
   description: string;
   minCapital: string;
   maxCapital: string;
   profitSplit: string;
-  monthlyTarget: string;
+  maxDrawdown: string;
+  tradingPeriod: string;
   challenge: boolean;
   instruments: string[];
   rating: number;
   reviews: number;
   features: string[];
+  offers: string[];
+  highlights: string[];
   website?: string;
   affiliateUrl?: string;
-  commission?: number;
 }
 
 interface DataContextType {
@@ -80,12 +81,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       name: 'Crypto Calculator',
       description: 'Calculate crypto conversions and portfolio values in real-time',
       category: 'Trading',
-      icon: '🧮',
+      iconUrl: 'https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@1a63530be6e374711a8554f31b17e4cb92c25fa5/32/btc.png',
       premium: false,
       rating: 4.8,
       url: '/tools/crypto-calculator',
       affiliateUrl: 'https://example.com/crypto-calc?ref=cryptohub',
-      commission: 15,
       features: ['Real-time prices', 'Portfolio tracking', 'Multi-currency support'],
     },
     {
@@ -93,12 +93,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       name: 'Technical Analysis Suite',
       description: 'Advanced charting tools with 50+ indicators',
       category: 'Analysis',
-      icon: '📊',
+      iconUrl: 'https://s3.tradingview.com/favicon.ico',
       premium: true,
       rating: 4.9,
       url: '/tools/technical-analysis',
       affiliateUrl: 'https://tradingview.com?ref=cryptohub',
-      commission: 25,
       features: ['50+ indicators', 'Custom alerts', 'Multi-timeframe analysis'],
     },
     {
@@ -106,7 +105,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       name: 'DCA Calculator',
       description: 'Dollar Cost Averaging calculator and strategy planner',
       category: 'Portfolio',
-      icon: '💰',
+      iconUrl: 'https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@1a63530be6e374711a8554f31b17e4cb92c25fa5/32/eth.png',
       premium: false,
       rating: 4.7,
       url: '/tools/dca-calculator',
@@ -117,12 +116,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       name: 'Arbitrage Scanner',
       description: 'Find arbitrage opportunities across exchanges',
       category: 'Trading',
-      icon: '⚡',
+      iconUrl: 'https://coinigy.com/favicon.ico',
       premium: true,
       rating: 4.9,
       url: '/tools/arbitrage-scanner',
       affiliateUrl: 'https://coinigy.com?ref=cryptohub',
-      commission: 30,
       features: ['Real-time scanning', '20+ exchanges', 'Profit calculations'],
     },
   ]);
@@ -140,7 +138,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       participants: 0,
       rating: 4.8,
       category: 'Infrastructure',
-      logo: '🔗',
+      iconUrl: 'https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@1a63530be6e374711a8554f31b17e4cb92c25fa5/32/qtum.png',
       status: 'upcoming',
       website: 'https://quantumchain.io',
       social: {
@@ -160,7 +158,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       participants: 15420,
       rating: 4.7,
       category: 'Sustainability',
-      logo: '⚡',
+      iconUrl: 'https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@1a63530be6e374711a8554f31b17e4cb92c25fa5/32/enj.png',
       status: 'active',
       website: 'https://greenenergycoin.io',
     },
@@ -170,38 +168,42 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     {
       id: '1',
       name: 'FTMO',
-      logo: '💼',
+      iconUrl: 'https://ftmo.com/favicon.ico',
       description: 'Leading prop trading firm with excellent profit splits and trading conditions',
       minCapital: '$10,000',
       maxCapital: '$400,000',
       profitSplit: '80%',
-      monthlyTarget: '10%',
+      maxDrawdown: '10%',
+      tradingPeriod: '30 days',
       challenge: true,
       instruments: ['Forex', 'Indices', 'Commodities', 'Crypto'],
       rating: 4.8,
       reviews: 2340,
       features: ['No time limit', 'Weekend holding allowed', 'Expert advisors allowed'],
+      offers: ['Free retries on challenge', '14-day money back guarantee', 'Bi-weekly payouts'],
+      highlights: ['Most trusted prop firm', 'Over 200,000 traders funded', 'Regulated by CySEC'],
       website: 'https://ftmo.com',
       affiliateUrl: 'https://ftmo.com?ref=cryptohub',
-      commission: 200,
     },
     {
       id: '2',
       name: 'MyForexFunds',
-      logo: '🚀',
+      iconUrl: 'https://myforexfunds.com/favicon.ico',
       description: 'Fast-growing prop firm with competitive terms and quick payouts',
       minCapital: '$5,000',
       maxCapital: '$300,000',
       profitSplit: '75%',
-      monthlyTarget: '8%',
+      maxDrawdown: '8%',
+      tradingPeriod: 'Unlimited',
       challenge: true,
       instruments: ['Forex', 'Indices', 'Commodities'],
       rating: 4.6,
       reviews: 1820,
       features: ['Rapid verification', 'Multiple account sizes', 'No minimum trading days'],
+      offers: ['50% discount on challenges', 'Instant funding after passing', 'Weekly payouts'],
+      highlights: ['Fastest growing prop firm', 'Same day payouts', '24/7 support'],
       website: 'https://myforexfunds.com',
       affiliateUrl: 'https://myforexfunds.com?ref=cryptohub',
-      commission: 150,
     },
   ]);
 

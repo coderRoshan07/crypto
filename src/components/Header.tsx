@@ -84,14 +84,7 @@ export default function Header() {
                   </div>
                 )}
               </div>
-            ) : (
-              <Link
-                to="/login"
-                className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-              >
-                Login
-              </Link>
-            )}
+            ) : null}
           </div>
 
           {/* Mobile menu button */}
@@ -144,15 +137,7 @@ export default function Header() {
                     Logout
                   </button>
                 </>
-              ) : (
-                <Link
-                  to="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 rounded-md text-left text-base font-medium text-gray-700 hover:text-blue-700 hover:bg-gray-50"
-                >
-                  Login
-                </Link>
-              )}
+              ) : null}
             </div>
           </div>
         )}

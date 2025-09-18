@@ -65,7 +65,15 @@ export default function ICOList() {
               {/* Header */}
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
-                  <div className="text-3xl mr-3">{ico.logo}</div>
+                  <img 
+                    src={ico.iconUrl} 
+                    alt={ico.name}
+                    className="w-12 h-12 mr-3 rounded-lg"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://via.placeholder.com/48x48/3B82F6/FFFFFF?text=' + ico.name.charAt(0);
+                    }}
+                  />
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900">{ico.name}</h3>
                     <span className="text-sm text-gray-500">{ico.symbol}</span>
