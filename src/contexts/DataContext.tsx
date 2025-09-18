@@ -88,6 +88,35 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isSupabaseConnected, setIsSupabaseConnected] = useState(false);
 
+  // Load data from localStorage for demo mode
+  const loadFromLocalStorage = () => {
+    try {
+      const storedTools = localStorage.getItem('demo_tools');
+      const storedIcos = localStorage.getItem('demo_icos');
+      const storedPropFirms = localStorage.getItem('demo_prop_firms');
+      
+      if (storedTools) setTools(JSON.parse(storedTools));
+      if (storedIcos) setIcos(JSON.parse(storedIcos));
+      if (storedPropFirms) setPropFirms(JSON.parse(storedPropFirms));
+      
+      return storedTools || storedIcos || storedPropFirms;
+    } catch (error) {
+      console.error('Error loading from localStorage:', error);
+      return false;
+    }
+  };
+
+  // Save data to localStorage for demo mode
+  const saveToLocalStorage = (tools: CryptoTool[], icos: ICOProject[], propFirms: PropFirm[]) => {
+    try {
+      localStorage.setItem('demo_tools', JSON.stringify(tools));
+      localStorage.setItem('demo_icos', JSON.stringify(icos));
+      localStorage.setItem('demo_prop_firms', JSON.stringify(propFirms));
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+    }
+  };
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -95,13 +124,18 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       // Check if Supabase is connected
       const { data: testData, error: testError } = await supabase
         .from('crypto_tools')
-        .select('count')
+        .select('id')
         .limit(1);
       
       if (testError) {
         console.log('Supabase not connected, using demo data');
         setIsSupabaseConnected(false);
-        loadDemoData();
+        
+        // Try to load from localStorage first
+        const hasStoredData = loadFromLocalStorage();
+        if (!hasStoredData) {
+          loadDemoData();
+        }
       } else {
         console.log('Supabase connected, loading real data');
         setIsSupabaseConnected(true);
@@ -123,7 +157,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Error fetching data:', error);
       setIsSupabaseConnected(false);
-      loadDemoData();
+      
+      // Try to load from localStorage first
+      const hasStoredData = loadFromLocalStorage();
+      if (!hasStoredData) {
+        loadDemoData();
+      }
     } finally {
       setLoading(false);
     }
@@ -212,6 +251,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     setTools(demoTools);
     setIcos(demoICOs);
     setPropFirms(demoPropFirms);
+    
+    // Save initial demo data to localStorage
+    saveToLocalStorage(demoTools, demoICOs, demoPropFirms);
   };
 
   useEffect(() => {
@@ -237,8 +279,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
-        setTools(prev => [newTool, ...prev]);
-        alert('Demo mode: Tool added locally. Connect to Supabase for persistent storage.');
+        const updatedTools = [newTool, ...tools];
+        setTools(updatedTools);
+        saveToLocalStorage(updatedTools, icos, propFirms);
       }
     } catch (error) {
       console.error('Error adding tool:', error);
@@ -265,8 +308,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
-        setIcos(prev => [newICO, ...prev]);
-        alert('Demo mode: ICO added locally. Connect to Supabase for persistent storage.');
+        const updatedIcos = [newICO, ...icos];
+        setIcos(updatedIcos);
+        saveToLocalStorage(tools, updatedIcos, propFirms);
       }
     } catch (error) {
       console.error('Error adding ICO:', error);
@@ -293,8 +337,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
-        setPropFirms(prev => [newFirm, ...prev]);
-        alert('Demo mode: Prop firm added locally. Connect to Supabase for persistent storage.');
+        const updatedFirms = [newFirm, ...propFirms];
+        setPropFirms(updatedFirms);
+        saveToLocalStorage(tools, icos, updatedFirms);
       }
     } catch (error) {
       console.error('Error adding prop firm:', error);
@@ -316,8 +361,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         setTools(prev => prev.map(tool => tool.id === id ? data : tool));
       } else {
         // Demo mode - just update local state
-        setTools(prev => prev.map(tool => tool.id === id ? { ...tool, ...updates } : tool));
-        alert('Demo mode: Tool updated locally. Connect to Supabase for persistent storage.');
+        const updatedTools = tools.map(tool => tool.id === id ? { ...tool, ...updates, updated_at: new Date().toISOString() } : tool);
+        setTools(updatedTools);
+        saveToLocalStorage(updatedTools, icos, propFirms);
       }
     } catch (error) {
       console.error('Error updating tool:', error);
@@ -339,8 +385,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         setIcos(prev => prev.map(ico => ico.id === id ? data : ico));
       } else {
         // Demo mode - just update local state
-        setIcos(prev => prev.map(ico => ico.id === id ? { ...ico, ...updates } : ico));
-        alert('Demo mode: ICO updated locally. Connect to Supabase for persistent storage.');
+        const updatedIcos = icos.map(ico => ico.id === id ? { ...ico, ...updates, updated_at: new Date().toISOString() } : ico);
+        setIcos(updatedIcos);
+        saveToLocalStorage(tools, updatedIcos, propFirms);
       }
     } catch (error) {
       console.error('Error updating ICO:', error);
@@ -362,8 +409,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         setPropFirms(prev => prev.map(firm => firm.id === id ? data : firm));
       } else {
         // Demo mode - just update local state
-        setPropFirms(prev => prev.map(firm => firm.id === id ? { ...firm, ...updates } : firm));
-        alert('Demo mode: Prop firm updated locally. Connect to Supabase for persistent storage.');
+        const updatedFirms = propFirms.map(firm => firm.id === id ? { ...firm, ...updates, updated_at: new Date().toISOString() } : firm);
+        setPropFirms(updatedFirms);
+        saveToLocalStorage(tools, icos, updatedFirms);
       }
     } catch (error) {
       console.error('Error updating prop firm:', error);
@@ -383,8 +431,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         setTools(prev => prev.filter(tool => tool.id !== id));
       } else {
         // Demo mode - just remove from local state
-        setTools(prev => prev.filter(tool => tool.id !== id));
-        alert('Demo mode: Tool deleted locally. Connect to Supabase for persistent storage.');
+        const updatedTools = tools.filter(tool => tool.id !== id);
+        setTools(updatedTools);
+        saveToLocalStorage(updatedTools, icos, propFirms);
       }
     } catch (error) {
       console.error('Error deleting tool:', error);
@@ -404,8 +453,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         setIcos(prev => prev.filter(ico => ico.id !== id));
       } else {
         // Demo mode - just remove from local state
-        setIcos(prev => prev.filter(ico => ico.id !== id));
-        alert('Demo mode: ICO deleted locally. Connect to Supabase for persistent storage.');
+        const updatedIcos = icos.filter(ico => ico.id !== id);
+        setIcos(updatedIcos);
+        saveToLocalStorage(tools, updatedIcos, propFirms);
       }
     } catch (error) {
       console.error('Error deleting ICO:', error);
@@ -425,8 +475,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         setPropFirms(prev => prev.filter(firm => firm.id !== id));
       } else {
         // Demo mode - just remove from local state
-        setPropFirms(prev => prev.filter(firm => firm.id !== id));
-        alert('Demo mode: Prop firm deleted locally. Connect to Supabase for persistent storage.');
+        const updatedFirms = propFirms.filter(firm => firm.id !== id);
+        setPropFirms(updatedFirms);
+        saveToLocalStorage(tools, icos, updatedFirms);
       }
     } catch (error) {
       console.error('Error deleting prop firm:', error);
