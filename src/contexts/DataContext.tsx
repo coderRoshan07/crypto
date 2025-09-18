@@ -66,6 +66,7 @@ interface DataContextType {
   icos: ICOProject[];
   propFirms: PropFirm[];
   loading: boolean;
+  isSupabaseConnected: boolean;
   addTool: (tool: Omit<CryptoTool, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   addICO: (ico: Omit<ICOProject, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   addPropFirm: (firm: Omit<PropFirm, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
@@ -443,6 +444,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       icos,
       propFirms,
       loading,
+      isSupabaseConnected,
       addTool,
       addICO,
       addPropFirm,

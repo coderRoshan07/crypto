@@ -9,7 +9,7 @@ import AddPropFirmModal from '../components/AddPropFirmModal';
 
 export default function Dashboard() {
   const { user, isAdmin } = useAuth();
-  const { tools, icos, propFirms, loading, deleteTool, deleteICO, deletePropFirm } = useData();
+  const { tools, icos, propFirms, loading, isSupabaseConnected, deleteTool, deleteICO, deletePropFirm } = useData();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [showAddToolModal, setShowAddToolModal] = useState(false);
