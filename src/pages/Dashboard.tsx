@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Edit, Trash2, DollarSign, TrendingUp, Users, Eye } from 'lucide-react';
+import { Plus, Edit, Trash2, DollarSign, TrendingUp, Users, Eye, Loader } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
 import AddToolModal from '../components/AddToolModal';
@@ -9,12 +9,13 @@ import AddPropFirmModal from '../components/AddPropFirmModal';
 
 export default function Dashboard() {
   const { user, isAdmin } = useAuth();
-  const { tools, icos, propFirms } = useData();
+  const { tools, icos, propFirms, loading, deleteTool, deleteICO, deletePropFirm } = useData();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [showAddToolModal, setShowAddToolModal] = useState(false);
   const [showAddICOModal, setShowAddICOModal] = useState(false);
   const [showAddPropFirmModal, setShowAddPropFirmModal] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
 
   if (!user || !isAdmin) {
     navigate('/login');
@@ -54,6 +55,37 @@ export default function Dashboard() {
     { id: 'icos', label: 'ICO Projects' },
     { id: 'propfirms', label: 'Prop Firms' },
   ];
+
+  const handleDelete = async (type: 'tool' | 'ico' | 'propfirm', id: string) => {
+    if (!confirm('Are you sure you want to delete this item?')) return;
+    
+    try {
+      setDeleteLoading(id);
+      if (type === 'tool') {
+        await deleteTool(id);
+      } else if (type === 'ico') {
+        await deleteICO(id);
+      } else if (type === 'propfirm') {
+        await deletePropFirm(id);
+      }
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      alert('Error deleting item. Please try again.');
+    } finally {
+      setDeleteLoading(null);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex items-center space-x-2">
+          <Loader className="h-6 w-6 animate-spin text-blue-600" />
+          <span className="text-gray-600">Loading dashboard...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -218,8 +250,16 @@ export default function Dashboard() {
                               <button className="text-indigo-600 hover:text-indigo-900">
                                 <Edit className="h-4 w-4" />
                               </button>
-                              <button className="text-red-600 hover:text-red-900">
-                                <Trash2 className="h-4 w-4" />
+                              <button 
+                                onClick={() => handleDelete('tool', tool.id)}
+                                disabled={deleteLoading === tool.id}
+                                className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                              >
+                                {deleteLoading === tool.id ? (
+                                  <Loader className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="h-4 w-4" />
+                                )}
                               </button>
                             </div>
                           </td>
@@ -274,8 +314,16 @@ export default function Dashboard() {
                           <button className="text-blue-600 hover:text-blue-900">
                             <Edit className="h-4 w-4" />
                           </button>
-                          <button className="text-red-600 hover:text-red-900">
-                            <Trash2 className="h-4 w-4" />
+                          <button 
+                            onClick={() => handleDelete('ico', ico.id)}
+                            disabled={deleteLoading === ico.id}
+                            className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                          >
+                            {deleteLoading === ico.id ? (
+                              <Loader className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
                           </button>
                         </div>
                       </div>
@@ -330,8 +378,16 @@ export default function Dashboard() {
                           <button className="text-blue-600 hover:text-blue-900">
                             <Edit className="h-4 w-4" />
                           </button>
-                          <button className="text-red-600 hover:text-red-900">
-                            <Trash2 className="h-4 w-4" />
+                          <button 
+                            onClick={() => handleDelete('propfirm', firm.id)}
+                            disabled={deleteLoading === firm.id}
+                            className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                          >
+                            {deleteLoading === firm.id ? (
+                              <Loader className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
                           </button>
                         </div>
                       </div>

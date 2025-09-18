@@ -43,8 +43,15 @@ export default function AddICOModal({ onClose }: AddICOModalProps) {
         Object.entries(formData.social).filter(([_, value]) => value.trim() !== '')
       ),
     };
-    addICO(icoData);
-    onClose();
+    
+    addICO(icoData)
+      .then(() => {
+        onClose();
+      })
+      .catch((error) => {
+        console.error('Error adding ICO:', error);
+        alert('Error adding ICO. Please try again.');
+      });
   };
 
   return (

@@ -40,8 +40,15 @@ export default function AddPropFirmModal({ onClose }: AddPropFirmModalProps) {
       website: formData.website || undefined,
       affiliateUrl: formData.affiliateUrl || undefined,
     };
-    addPropFirm(firmData);
-    onClose();
+    
+    addPropFirm(firmData)
+      .then(() => {
+        onClose();
+      })
+      .catch((error) => {
+        console.error('Error adding prop firm:', error);
+        alert('Error adding prop firm. Please try again.');
+      });
   };
 
   const addFeature = () => {

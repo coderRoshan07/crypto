@@ -28,11 +28,17 @@ export default function AddToolModal({ onClose }: AddToolModalProps) {
     const toolData = {
       ...formData,
       features: formData.features.filter(f => f.trim() !== ''),
-      commission: formData.commission || undefined,
       affiliateUrl: formData.affiliateUrl || undefined,
     };
-    addTool(toolData);
-    onClose();
+    
+    addTool(toolData)
+      .then(() => {
+        onClose();
+      })
+      .catch((error) => {
+        console.error('Error adding tool:', error);
+        alert('Error adding tool. Please try again.');
+      });
   };
 
   const addFeature = () => {

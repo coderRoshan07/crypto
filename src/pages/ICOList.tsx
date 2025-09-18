@@ -5,7 +5,7 @@ import { useData } from '../contexts/DataContext';
 
 export default function ICOList() {
   const [activeTab, setActiveTab] = useState('upcoming');
-  const { icos } = useData();
+  const { icos, loading } = useData();
 
   const filteredICOs = icos.filter(ico => ico.status === activeTab);
 
@@ -59,6 +59,11 @@ export default function ICOList() {
         </div>
 
         {/* ICO Cards */}
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredICOs.map((ico) => (
             <div key={ico.id} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
@@ -66,7 +71,7 @@ export default function ICOList() {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
                   <img 
-                    src={ico.iconUrl} 
+                    src={ico.icon_url} 
                     alt={ico.name}
                     className="w-12 h-12 mr-3 rounded-lg"
                     onError={(e) => {
@@ -116,7 +121,7 @@ export default function ICOList() {
                     <Calendar className="h-4 w-4 mr-2" />
                     Start Date
                   </div>
-                  <span className="text-gray-900">{ico.startDate}</span>
+                  <span className="text-gray-900">{ico.start_date}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center text-gray-600">
@@ -151,6 +156,7 @@ export default function ICOList() {
             </div>
           ))}
         </div>
+        )}
 
         {filteredICOs.length === 0 && (
           <div className="text-center py-12">

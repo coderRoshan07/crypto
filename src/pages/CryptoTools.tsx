@@ -6,7 +6,7 @@ import { useData } from '../contexts/DataContext';
 export default function CryptoTools() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const { tools } = useData();
+  const { tools, loading } = useData();
 
   const categories = ['All', 'Trading', 'Portfolio', 'Analysis', 'Security', 'Mining'];
 
@@ -19,8 +19,8 @@ export default function CryptoTools() {
 
   const handleToolClick = (tool: any) => {
     // Track affiliate click
-    if (tool.affiliateUrl) {
-      window.open(tool.affiliateUrl, '_blank');
+    if (tool.affiliate_url) {
+      window.open(tool.affiliate_url, '_blank');
     }
   };
 
@@ -65,13 +65,18 @@ export default function CryptoTools() {
         </div>
 
         {/* Tools Grid */}
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTools.map((tool) => (
             <div key={tool.id} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-4">
                 <div className="bg-blue-100 p-3 rounded-lg">
                   <img 
-                    src={tool.iconUrl} 
+                    src={tool.icon_url} 
                     alt={tool.name}
                     className="w-8 h-8"
                     onError={(e) => {
@@ -81,11 +86,6 @@ export default function CryptoTools() {
                   />
                 </div>
                 <div className="flex items-center space-x-2">
-                  {tool.premium && (
-                    <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-                      PRO
-                    </span>
-                  )}
                 </div>
               </div>
               
@@ -126,6 +126,7 @@ export default function CryptoTools() {
             </div>
           ))}
         </div>
+        )}
 
         {filteredTools.length === 0 && (
           <div className="text-center py-12">

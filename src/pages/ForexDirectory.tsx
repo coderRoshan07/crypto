@@ -6,7 +6,7 @@ import { useData } from '../contexts/DataContext';
 export default function ForexDirectory() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
-  const { propFirms } = useData();
+  const { propFirms, loading } = useData();
 
   const filters = ['All', 'High Capital', 'Low Capital', 'No Challenge', 'Crypto Friendly'];
 
@@ -16,9 +16,9 @@ export default function ForexDirectory() {
     
     let matchesFilter = true;
     if (selectedFilter === 'High Capital') {
-      matchesFilter = parseInt(firm.maxCapital.replace(/[$,]/g, '')) >= 200000;
+      matchesFilter = parseInt(firm.max_capital.replace(/[$,]/g, '')) >= 200000;
     } else if (selectedFilter === 'Low Capital') {
-      matchesFilter = parseInt(firm.minCapital.replace(/[$,]/g, '')) <= 10000;
+      matchesFilter = parseInt(firm.min_capital.replace(/[$,]/g, '')) <= 10000;
     } else if (selectedFilter === 'No Challenge') {
       matchesFilter = !firm.challenge;
     } else if (selectedFilter === 'Crypto Friendly') {
@@ -30,8 +30,8 @@ export default function ForexDirectory() {
 
   const handleApplyClick = (firm: any) => {
     // Track affiliate click
-    if (firm.affiliateUrl) {
-      window.open(firm.affiliateUrl, '_blank');
+    if (firm.affiliate_url) {
+      window.open(firm.affiliate_url, '_blank');
     } else if (firm.website) {
       window.open(firm.website, '_blank');
     }
@@ -75,6 +75,11 @@ export default function ForexDirectory() {
         </div>
 
         {/* Prop Firms Grid */}
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        ) : (
         <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-8">
           {filteredFirms.map((firm) => (
             <div key={firm.id} className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
@@ -82,7 +87,7 @@ export default function ForexDirectory() {
               <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center">
                   <img 
-                    src={firm.iconUrl} 
+                    src={firm.icon_url} 
                     alt={firm.name}
                     className="w-16 h-16 mr-4 rounded-xl shadow-md"
                     onError={(e) => {
@@ -150,10 +155,10 @@ export default function ForexDirectory() {
                     <span className="text-xs font-medium">Capital</span>
                   </div>
                   <div className="font-bold text-gray-900 text-sm">
-                    {firm.minCapital}
+                    {firm.min_capital}
                   </div>
                   <div className="text-xs text-gray-500">
-                    up to {firm.maxCapital}
+                    up to {firm.max_capital}
                   </div>
                 </div>
                 <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg border border-green-100">
@@ -161,13 +166,13 @@ export default function ForexDirectory() {
                     <TrendingUp className="h-4 w-4 mr-1" />
                     <span className="text-xs font-medium">Profit Split</span>
                   </div>
-                  <div className="font-bold text-green-600 text-lg">{firm.profitSplit}</div>
+                  <div className="font-bold text-green-600 text-lg">{firm.profit_split}</div>
                 </div>
                 <div className="bg-gradient-to-br from-orange-50 to-red-50 p-4 rounded-lg border border-orange-100">
                   <div className="flex items-center text-gray-600 mb-1">
                     <span className="text-xs font-medium">Max Drawdown</span>
                   </div>
-                  <div className="font-bold text-orange-600 text-lg">{firm.maxDrawdown}</div>
+                  <div className="font-bold text-orange-600 text-lg">{firm.max_drawdown}</div>
                 </div>
               </div>
 
@@ -215,6 +220,7 @@ export default function ForexDirectory() {
             </div>
           ))}
         </div>
+        )}
 
         {filteredFirms.length === 0 && (
           <div className="text-center py-12">
