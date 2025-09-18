@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 interface User {
   id: string;
@@ -28,19 +29,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Mock authentication - in real app, this would call your API
-    if (email === 'admin@cryptohub.com' && password === 'admin123') {
-      const adminUser: User = {
-        id: '1',
-        email: 'admin@cryptohub.com',
-        name: 'Admin User',
-        role: 'admin'
-      };
-      setUser(adminUser);
-      localStorage.setItem('user', JSON.stringify(adminUser));
-      return true;
+    try {
+      // For demo purposes, we'll use simple email/password check
+      // In production, you'd use Supabase Auth
+      if (email === 'admin@cryptohub.com' && password === 'admin123') {
+        const adminUser: User = {
+          id: '1',
+          email: 'admin@cryptohub.com',
+          name: 'Admin User',
+          role: 'admin'
+        };
+        setUser(adminUser);
+        localStorage.setItem('user', JSON.stringify(adminUser));
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
     }
-    return false;
   };
 
   const logout = () => {

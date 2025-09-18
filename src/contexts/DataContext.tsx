@@ -1,249 +1,205 @@
-import React, { createContext, useContext, useState } from 'react';
-
-export interface CryptoTool {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  iconUrl: string;
-  premium: boolean;
-  rating: number;
-  url: string;
-  affiliateUrl?: string;
-  features: string[];
-}
-
-export interface ICOProject {
-  id: string;
-  name: string;
-  symbol: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  target: string;
-  raised: string;
-  participants: number;
-  rating: number;
-  category: string;
-  iconUrl: string;
-  status: 'upcoming' | 'active' | 'completed';
-  website?: string;
-  whitepaper?: string;
-  social?: {
-    twitter?: string;
-    telegram?: string;
-    discord?: string;
-  };
-}
-
-export interface PropFirm {
-  id: string;
-  name: string;
-  iconUrl: string;
-  description: string;
-  minCapital: string;
-  maxCapital: string;
-  profitSplit: string;
-  maxDrawdown: string;
-  tradingPeriod: string;
-  challenge: boolean;
-  instruments: string[];
-  rating: number;
-  reviews: number;
-  features: string[];
-  offers: string[];
-  highlights: string[];
-  website?: string;
-  affiliateUrl?: string;
-}
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase, CryptoTool, ICOProject, PropFirm } from '../lib/supabase';
 
 interface DataContextType {
   tools: CryptoTool[];
   icos: ICOProject[];
   propFirms: PropFirm[];
-  addTool: (tool: Omit<CryptoTool, 'id'>) => void;
-  addICO: (ico: Omit<ICOProject, 'id'>) => void;
-  addPropFirm: (firm: Omit<PropFirm, 'id'>) => void;
-  updateTool: (id: string, tool: Partial<CryptoTool>) => void;
-  updateICO: (id: string, ico: Partial<ICOProject>) => void;
-  updatePropFirm: (id: string, firm: Partial<PropFirm>) => void;
-  deleteTool: (id: string) => void;
-  deleteICO: (id: string) => void;
-  deletePropFirm: (id: string) => void;
+  loading: boolean;
+  addTool: (tool: Omit<CryptoTool, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  addICO: (ico: Omit<ICOProject, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  addPropFirm: (firm: Omit<PropFirm, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  updateTool: (id: string, tool: Partial<CryptoTool>) => Promise<void>;
+  updateICO: (id: string, ico: Partial<ICOProject>) => Promise<void>;
+  updatePropFirm: (id: string, firm: Partial<PropFirm>) => Promise<void>;
+  deleteTool: (id: string) => Promise<void>;
+  deleteICO: (id: string) => Promise<void>;
+  deletePropFirm: (id: string) => Promise<void>;
+  refreshData: () => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export function DataProvider({ children }: { children: React.ReactNode }) {
-  const [tools, setTools] = useState<CryptoTool[]>([
-    {
-      id: '1',
-      name: 'Crypto Calculator',
-      description: 'Calculate crypto conversions and portfolio values in real-time',
-      category: 'Trading',
-      iconUrl: 'https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@1a63530be6e374711a8554f31b17e4cb92c25fa5/32/btc.png',
-      premium: false,
-      rating: 4.8,
-      url: '/tools/crypto-calculator',
-      affiliateUrl: 'https://example.com/crypto-calc?ref=cryptohub',
-      features: ['Real-time prices', 'Portfolio tracking', 'Multi-currency support'],
-    },
-    {
-      id: '2',
-      name: 'Technical Analysis Suite',
-      description: 'Advanced charting tools with 50+ indicators',
-      category: 'Analysis',
-      iconUrl: 'https://s3.tradingview.com/favicon.ico',
-      premium: true,
-      rating: 4.9,
-      url: '/tools/technical-analysis',
-      affiliateUrl: 'https://tradingview.com?ref=cryptohub',
-      features: ['50+ indicators', 'Custom alerts', 'Multi-timeframe analysis'],
-    },
-    {
-      id: '3',
-      name: 'DCA Calculator',
-      description: 'Dollar Cost Averaging calculator and strategy planner',
-      category: 'Portfolio',
-      iconUrl: 'https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@1a63530be6e374711a8554f31b17e4cb92c25fa5/32/eth.png',
-      premium: false,
-      rating: 4.7,
-      url: '/tools/dca-calculator',
-      features: ['Historical backtesting', 'Strategy optimization', 'Risk analysis'],
-    },
-    {
-      id: '4',
-      name: 'Arbitrage Scanner',
-      description: 'Find arbitrage opportunities across exchanges',
-      category: 'Trading',
-      iconUrl: 'https://coinigy.com/favicon.ico',
-      premium: true,
-      rating: 4.9,
-      url: '/tools/arbitrage-scanner',
-      affiliateUrl: 'https://coinigy.com?ref=cryptohub',
-      features: ['Real-time scanning', '20+ exchanges', 'Profit calculations'],
-    },
-  ]);
+  const [tools, setTools] = useState<CryptoTool[]>([]);
+  const [icos, setIcos] = useState<ICOProject[]>([]);
+  const [propFirms, setPropFirms] = useState<PropFirm[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [icos, setIcos] = useState<ICOProject[]>([
-    {
-      id: '1',
-      name: 'QuantumChain',
-      symbol: 'QTC',
-      description: 'Next-generation blockchain with quantum-resistant security',
-      startDate: '2024-02-15',
-      endDate: '2024-03-15',
-      target: '$50M',
-      raised: '$0',
-      participants: 0,
-      rating: 4.8,
-      category: 'Infrastructure',
-      iconUrl: 'https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@1a63530be6e374711a8554f31b17e4cb92c25fa5/32/qtum.png',
-      status: 'upcoming',
-      website: 'https://quantumchain.io',
-      social: {
-        twitter: 'https://twitter.com/quantumchain',
-        telegram: 'https://t.me/quantumchain',
-      },
-    },
-    {
-      id: '2',
-      name: 'GreenEnergy Coin',
-      symbol: 'GEC',
-      description: 'Sustainable blockchain for renewable energy trading',
-      startDate: '2024-01-15',
-      endDate: '2024-02-15',
-      target: '$40M',
-      raised: '$28M',
-      participants: 15420,
-      rating: 4.7,
-      category: 'Sustainability',
-      iconUrl: 'https://cdn.jsdelivr.net/gh/atomiclabs/cryptocurrency-icons@1a63530be6e374711a8554f31b17e4cb92c25fa5/32/enj.png',
-      status: 'active',
-      website: 'https://greenenergycoin.io',
-    },
-  ]);
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      
+      const [toolsResponse, icosResponse, propFirmsResponse] = await Promise.all([
+        supabase.from('crypto_tools').select('*').order('created_at', { ascending: false }),
+        supabase.from('ico_projects').select('*').order('created_at', { ascending: false }),
+        supabase.from('prop_firms').select('*').order('created_at', { ascending: false })
+      ]);
 
-  const [propFirms, setPropFirms] = useState<PropFirm[]>([
-    {
-      id: '1',
-      name: 'FTMO',
-      iconUrl: 'https://ftmo.com/favicon.ico',
-      description: 'Leading prop trading firm with excellent profit splits and trading conditions',
-      minCapital: '$10,000',
-      maxCapital: '$400,000',
-      profitSplit: '80%',
-      maxDrawdown: '10%',
-      tradingPeriod: '30 days',
-      challenge: true,
-      instruments: ['Forex', 'Indices', 'Commodities', 'Crypto'],
-      rating: 4.8,
-      reviews: 2340,
-      features: ['No time limit', 'Weekend holding allowed', 'Expert advisors allowed'],
-      offers: ['Free retries on challenge', '14-day money back guarantee', 'Bi-weekly payouts'],
-      highlights: ['Most trusted prop firm', 'Over 200,000 traders funded', 'Regulated by CySEC'],
-      website: 'https://ftmo.com',
-      affiliateUrl: 'https://ftmo.com?ref=cryptohub',
-    },
-    {
-      id: '2',
-      name: 'MyForexFunds',
-      iconUrl: 'https://myforexfunds.com/favicon.ico',
-      description: 'Fast-growing prop firm with competitive terms and quick payouts',
-      minCapital: '$5,000',
-      maxCapital: '$300,000',
-      profitSplit: '75%',
-      maxDrawdown: '8%',
-      tradingPeriod: 'Unlimited',
-      challenge: true,
-      instruments: ['Forex', 'Indices', 'Commodities'],
-      rating: 4.6,
-      reviews: 1820,
-      features: ['Rapid verification', 'Multiple account sizes', 'No minimum trading days'],
-      offers: ['50% discount on challenges', 'Instant funding after passing', 'Weekly payouts'],
-      highlights: ['Fastest growing prop firm', 'Same day payouts', '24/7 support'],
-      website: 'https://myforexfunds.com',
-      affiliateUrl: 'https://myforexfunds.com?ref=cryptohub',
-    },
-  ]);
+      if (toolsResponse.error) throw toolsResponse.error;
+      if (icosResponse.error) throw icosResponse.error;
+      if (propFirmsResponse.error) throw propFirmsResponse.error;
 
-  const addTool = (tool: Omit<CryptoTool, 'id'>) => {
-    const newTool = { ...tool, id: Date.now().toString() };
-    setTools(prev => [...prev, newTool]);
+      setTools(toolsResponse.data || []);
+      setIcos(icosResponse.data || []);
+      setPropFirms(propFirmsResponse.data || []);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const addICO = (ico: Omit<ICOProject, 'id'>) => {
-    const newICO = { ...ico, id: Date.now().toString() };
-    setIcos(prev => [...prev, newICO]);
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const addTool = async (tool: Omit<CryptoTool, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('crypto_tools')
+        .insert([tool])
+        .select()
+        .single();
+
+      if (error) throw error;
+      setTools(prev => [data, ...prev]);
+    } catch (error) {
+      console.error('Error adding tool:', error);
+      throw error;
+    }
   };
 
-  const addPropFirm = (firm: Omit<PropFirm, 'id'>) => {
-    const newFirm = { ...firm, id: Date.now().toString() };
-    setPropFirms(prev => [...prev, newFirm]);
+  const addICO = async (ico: Omit<ICOProject, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('ico_projects')
+        .insert([ico])
+        .select()
+        .single();
+
+      if (error) throw error;
+      setIcos(prev => [data, ...prev]);
+    } catch (error) {
+      console.error('Error adding ICO:', error);
+      throw error;
+    }
   };
 
-  const updateTool = (id: string, updates: Partial<CryptoTool>) => {
-    setTools(prev => prev.map(tool => tool.id === id ? { ...tool, ...updates } : tool));
+  const addPropFirm = async (firm: Omit<PropFirm, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('prop_firms')
+        .insert([firm])
+        .select()
+        .single();
+
+      if (error) throw error;
+      setPropFirms(prev => [data, ...prev]);
+    } catch (error) {
+      console.error('Error adding prop firm:', error);
+      throw error;
+    }
   };
 
-  const updateICO = (id: string, updates: Partial<ICOProject>) => {
-    setIcos(prev => prev.map(ico => ico.id === id ? { ...ico, ...updates } : ico));
+  const updateTool = async (id: string, updates: Partial<CryptoTool>) => {
+    try {
+      const { data, error } = await supabase
+        .from('crypto_tools')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      setTools(prev => prev.map(tool => tool.id === id ? data : tool));
+    } catch (error) {
+      console.error('Error updating tool:', error);
+      throw error;
+    }
   };
 
-  const updatePropFirm = (id: string, updates: Partial<PropFirm>) => {
-    setPropFirms(prev => prev.map(firm => firm.id === id ? { ...firm, ...updates } : firm));
+  const updateICO = async (id: string, updates: Partial<ICOProject>) => {
+    try {
+      const { data, error } = await supabase
+        .from('ico_projects')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      setIcos(prev => prev.map(ico => ico.id === id ? data : ico));
+    } catch (error) {
+      console.error('Error updating ICO:', error);
+      throw error;
+    }
   };
 
-  const deleteTool = (id: string) => {
-    setTools(prev => prev.filter(tool => tool.id !== id));
+  const updatePropFirm = async (id: string, updates: Partial<PropFirm>) => {
+    try {
+      const { data, error } = await supabase
+        .from('prop_firms')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      setPropFirms(prev => prev.map(firm => firm.id === id ? data : firm));
+    } catch (error) {
+      console.error('Error updating prop firm:', error);
+      throw error;
+    }
   };
 
-  const deleteICO = (id: string) => {
-    setIcos(prev => prev.filter(ico => ico.id !== id));
+  const deleteTool = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('crypto_tools')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      setTools(prev => prev.filter(tool => tool.id !== id));
+    } catch (error) {
+      console.error('Error deleting tool:', error);
+      throw error;
+    }
   };
 
-  const deletePropFirm = (id: string) => {
-    setPropFirms(prev => prev.filter(firm => firm.id !== id));
+  const deleteICO = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('ico_projects')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      setIcos(prev => prev.filter(ico => ico.id !== id));
+    } catch (error) {
+      console.error('Error deleting ICO:', error);
+      throw error;
+    }
+  };
+
+  const deletePropFirm = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('prop_firms')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      setPropFirms(prev => prev.filter(firm => firm.id !== id));
+    } catch (error) {
+      console.error('Error deleting prop firm:', error);
+      throw error;
+    }
+  };
+
+  const refreshData = async () => {
+    await fetchData();
   };
 
   return (
@@ -251,6 +207,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       tools,
       icos,
       propFirms,
+      loading,
       addTool,
       addICO,
       addPropFirm,
@@ -260,6 +217,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       deleteTool,
       deleteICO,
       deletePropFirm,
+      refreshData,
     }}>
       {children}
     </DataContext.Provider>
