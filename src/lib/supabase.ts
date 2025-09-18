@@ -1,10 +1,27 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// These will be set when you connect to Supabase
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
+// Create Supabase client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Test Supabase connection
+export const testSupabaseConnection = async () => {
+  try {
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return false;
+    }
+    
+    const { data, error } = await supabase
+      .from('crypto_tools')
+      .select('id')
+      .limit(1);
+    
+    return !error;
+  } catch (error) {
+    console.log('Supabase connection test failed:', error);
+    return false;
+  }
+};
