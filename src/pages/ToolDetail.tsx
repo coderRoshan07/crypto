@@ -47,8 +47,16 @@ export default function ToolDetail() {
         <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center">
-              <div className="bg-blue-100 p-4 rounded-xl text-4xl mr-6">
-                {tool.icon}
+              <div className="bg-blue-100 p-4 rounded-xl mr-6">
+                <img 
+                  src={tool.iconUrl} 
+                  alt={tool.name}
+                  className="w-16 h-16"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'https://via.placeholder.com/64x64/3B82F6/FFFFFF?text=' + tool.name.charAt(0);
+                  }}
+                />
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">{tool.name}</h1>
@@ -79,16 +87,6 @@ export default function ToolDetail() {
 
           <p className="text-lg text-gray-600 mb-6">{tool.description}</p>
 
-          {tool.commission && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-              <div className="flex items-center">
-                <DollarSign className="h-5 w-5 text-green-600 mr-2" />
-                <span className="text-green-800 font-medium">
-                  Earn ${tool.commission} commission when users sign up through your referral
-                </span>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Features */}

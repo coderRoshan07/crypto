@@ -47,7 +47,15 @@ export default function PropFirmDetail() {
         <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center">
-              <div className="text-6xl mr-6">{firm.logo}</div>
+              <img 
+                src={firm.iconUrl} 
+                alt={firm.name}
+                className="w-24 h-24 mr-6 rounded-xl shadow-lg"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = 'https://via.placeholder.com/96x96/3B82F6/FFFFFF?text=' + firm.name.charAt(0);
+                }}
+              />
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">{firm.name}</h1>
                 <div className="flex items-center space-x-4 mb-3">
@@ -93,16 +101,6 @@ export default function PropFirmDetail() {
 
           <p className="text-lg text-gray-600 mb-6">{firm.description}</p>
 
-          {firm.commission && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <div className="flex items-center">
-                <DollarSign className="h-5 w-5 text-green-600 mr-2" />
-                <span className="text-green-800 font-medium">
-                  Earn ${firm.commission} commission for each successful referral
-                </span>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Key Stats */}
@@ -129,8 +127,8 @@ export default function PropFirmDetail() {
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Monthly Target</p>
-                <p className="text-2xl font-bold text-orange-600">{firm.monthlyTarget}</p>
+                <p className="text-sm text-gray-600 mb-1">Max Drawdown</p>
+                <p className="text-2xl font-bold text-orange-600">{firm.maxDrawdown}</p>
               </div>
               <TrendingUp className="h-8 w-8 text-orange-600" />
             </div>
@@ -231,7 +229,15 @@ export default function PropFirmDetail() {
                   to={`/forex/${relatedFirm.id}`}
                   className="flex items-center p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
                 >
-                  <div className="text-3xl mr-4">{relatedFirm.logo}</div>
+                  <img 
+                    src={relatedFirm.iconUrl} 
+                    alt={relatedFirm.name}
+                    className="w-12 h-12 mr-4 rounded-lg"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://via.placeholder.com/48x48/3B82F6/FFFFFF?text=' + relatedFirm.name.charAt(0);
+                    }}
+                  />
                   <div>
                     <h3 className="font-medium text-gray-900">{relatedFirm.name}</h3>
                     <p className="text-sm text-gray-600">Profit Split: {relatedFirm.profitSplit}</p>

@@ -54,7 +54,15 @@ export default function ICODetail() {
         <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center">
-              <div className="text-6xl mr-6">{ico.logo}</div>
+              <img 
+                src={ico.iconUrl} 
+                alt={ico.name}
+                className="w-24 h-24 mr-6 rounded-xl shadow-lg"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = 'https://via.placeholder.com/96x96/3B82F6/FFFFFF?text=' + ico.name.charAt(0);
+                }}
+              />
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">{ico.name}</h1>
                 <div className="flex items-center space-x-4 mb-3">
@@ -247,7 +255,15 @@ export default function ICODetail() {
                   to={`/ico/${relatedICO.id}`}
                   className="flex items-center p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
                 >
-                  <div className="text-3xl mr-4">{relatedICO.logo}</div>
+                  <img 
+                    src={relatedICO.iconUrl} 
+                    alt={relatedICO.name}
+                    className="w-12 h-12 mr-4 rounded-lg"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://via.placeholder.com/48x48/3B82F6/FFFFFF?text=' + relatedICO.name.charAt(0);
+                    }}
+                  />
                   <div>
                     <h3 className="font-medium text-gray-900">{relatedICO.name}</h3>
                     <p className="text-sm text-gray-600">{relatedICO.symbol} • {relatedICO.category}</p>

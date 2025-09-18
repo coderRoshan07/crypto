@@ -184,7 +184,15 @@ export default function Dashboard() {
                         <tr key={tool.id}>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
-                              <div className="text-2xl mr-3">{tool.icon}</div>
+                              <img 
+                                src={tool.iconUrl} 
+                                alt={tool.name}
+                                className="w-8 h-8 mr-3 rounded"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.src = 'https://via.placeholder.com/32x32/3B82F6/FFFFFF?text=' + tool.name.charAt(0);
+                                }}
+                              />
                               <div>
                                 <div className="text-sm font-medium text-gray-900">{tool.name}</div>
                                 <div className="text-sm text-gray-500">{tool.description.substring(0, 50)}...</div>
@@ -197,7 +205,7 @@ export default function Dashboard() {
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {tool.commission ? `$${tool.commission}` : 'N/A'}
+                            N/A
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {tool.rating}
@@ -239,7 +247,15 @@ export default function Dashboard() {
                   {icos.map((ico) => (
                     <div key={ico.id} className="border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center mb-3">
-                        <div className="text-2xl mr-3">{ico.logo}</div>
+                        <img 
+                          src={ico.iconUrl} 
+                          alt={ico.name}
+                          className="w-8 h-8 mr-3 rounded"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = 'https://via.placeholder.com/32x32/3B82F6/FFFFFF?text=' + ico.name.charAt(0);
+                          }}
+                        />
                         <div>
                           <h4 className="font-medium text-gray-900">{ico.name}</h4>
                           <p className="text-sm text-gray-500">{ico.symbol}</p>
@@ -286,7 +302,15 @@ export default function Dashboard() {
                     <div key={firm.id} className="border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center">
-                          <div className="text-2xl mr-3">{firm.logo}</div>
+                          <img 
+                            src={firm.iconUrl} 
+                            alt={firm.name}
+                            className="w-8 h-8 mr-3 rounded"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = 'https://via.placeholder.com/32x32/3B82F6/FFFFFF?text=' + firm.name.charAt(0);
+                            }}
+                          />
                           <div>
                             <h4 className="font-medium text-gray-900">{firm.name}</h4>
                             <p className="text-sm text-gray-500">Rating: {firm.rating}</p>
@@ -300,7 +324,7 @@ export default function Dashboard() {
                       <p className="text-sm text-gray-600 mb-3">{firm.description.substring(0, 100)}...</p>
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">
-                          Commission: {firm.commission ? `$${firm.commission}` : 'N/A'}
+                          Max Drawdown: {firm.maxDrawdown}
                         </span>
                         <div className="flex space-x-2">
                           <button className="text-blue-600 hover:text-blue-900">
