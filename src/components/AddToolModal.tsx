@@ -16,7 +16,7 @@ export default function AddToolModal({ onClose }: AddToolModalProps) {
     premium: false,
     rating: 4.0,
     url: '',
-    affiliateUrl: '',
+    affiliate_url: '',
     commission: 0,
     features: [''],
   });
@@ -28,7 +28,7 @@ export default function AddToolModal({ onClose }: AddToolModalProps) {
     const toolData = {
       ...formData,
       features: formData.features.filter(f => f.trim() !== ''),
-      affiliateUrl: formData.affiliateUrl || undefined,
+      affiliate_url: formData.affiliate_url || undefined,
     };
     
     addTool(toolData)
@@ -163,8 +163,8 @@ export default function AddToolModal({ onClose }: AddToolModalProps) {
               </label>
               <input
                 type="url"
-                value={formData.affiliateUrl}
-                onChange={(e) => setFormData(prev => ({ ...prev, affiliateUrl: e.target.value }))}
+                value={formData.affiliate_url}
+                onChange={(e) => setFormData(prev => ({ ...prev, affiliate_url: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>

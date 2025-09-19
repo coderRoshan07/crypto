@@ -24,8 +24,8 @@ export default function ToolDetail() {
   }
 
   const handleUseToolClick = () => {
-    if (tool.affiliateUrl) {
-      window.open(tool.affiliateUrl, '_blank');
+    if (tool.affiliate_url) {
+      window.open(tool.affiliate_url, '_blank');
     } else {
       window.open(tool.url, '_blank');
     }
