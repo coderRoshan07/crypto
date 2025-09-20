@@ -1,65 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase, testSupabaseConnection } from '../lib/supabase';
-
-// Database types
-export interface CryptoTool {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  icon_url: string;
-  premium: boolean;
-  rating: number;
-  url: string;
-  affiliate_url?: string;
-  features: string[];
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ICOProject {
-  id: string;
-  name: string;
-  symbol: string;
-  description: string;
-  start_date: string;
-  end_date: string;
-  target: string;
-  raised: string;
-  participants: number;
-  rating: number;
-  category: string;
-  icon_url: string;
-  status: 'upcoming' | 'active' | 'completed';
-  website?: string;
-  whitepaper?: string;
-  social?: Record<string, string>;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface PropFirm {
-  id: string;
-  name: string;
-  icon_url: string;
-  description: string;
-  min_capital: string;
-  max_capital: string;
-  profit_split: string;
-  max_drawdown: string;
-  trading_period: string;
-  challenge: boolean;
-  instruments: string[];
-  rating: number;
-  reviews: number;
-  features: string[];
-  offers: string[];
-  highlights: string[];
-  website?: string;
-  affiliate_url?: string;
-  created_at: string;
-  updated_at: string;
-}
+import { 
+  testSupabaseConnection, 
+  cryptoToolsAPI, 
+  icoProjectsAPI, 
+  propFirmsAPI,
+  CryptoTool,
+  ICOProject,
+  PropFirm
+} from '../lib/supabase';
 
 interface DataContextType {
   tools: CryptoTool[];
@@ -109,14 +57,23 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
       // Fetch data from Supabase
       const [toolsResponse, icosResponse, propFirmsResponse] = await Promise.all([
-        supabase.from('crypto_tools').select('*').order('created_at', { ascending: false }),
-        supabase.from('ico_projects').select('*').order('created_at', { ascending: false }),
-        supabase.from('prop_firms').select('*').order('created_at', { ascending: false })
+        cryptoToolsAPI.getAll(),
+        icoProjectsAPI.getAll(),
+        propFirmsAPI.getAll()
       ]);
 
-      if (toolsResponse.error) throw toolsResponse.error;
-      if (icosResponse.error) throw icosResponse.error;
-      if (propFirmsResponse.error) throw propFirmsResponse.error;
+      if (toolsResponse.error) {
+        console.error('Error fetching tools:', toolsResponse.error);
+        throw new Error(`Tools: ${toolsResponse.error.message}`);
+      }
+      if (icosResponse.error) {
+        console.error('Error fetching ICOs:', icosResponse.error);
+        throw new Error(`ICOs: ${icosResponse.error.message}`);
+      }
+      if (propFirmsResponse.error) {
+        console.error('Error fetching prop firms:', propFirmsResponse.error);
+        throw new Error(`Prop Firms: ${propFirmsResponse.error.message}`);
+      }
 
       setTools(toolsResponse.data || []);
       setIcos(icosResponse.data || []);
@@ -135,18 +92,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     fetchData();
   }, []);
 
-  const addTool = async (tool: Omit<CryptoTool, 'id' | 'created_at' | 'updated_at'>) => {
+  const addTool = async (toolData: Omit<CryptoTool, 'id' | 'created_at' | 'updated_at'>) => {
     if (!isSupabaseConnected) {
       throw new Error('Database not connected. Please connect to Supabase first.');
     }
 
     try {
-      const { data, error } = await supabase
-        .from('crypto_tools')
-        .insert([tool])
-        .select()
-        .single();
-
+      const { data, error } = await cryptoToolsAPI.create(toolData);
       if (error) throw error;
       setTools(prev => [data, ...prev]);
     } catch (error) {
@@ -155,18 +107,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const addICO = async (ico: Omit<ICOProject, 'id' | 'created_at' | 'updated_at'>) => {
+  const addICO = async (icoData: Omit<ICOProject, 'id' | 'created_at' | 'updated_at'>) => {
     if (!isSupabaseConnected) {
       throw new Error('Database not connected. Please connect to Supabase first.');
     }
 
     try {
-      const { data, error } = await supabase
-        .from('ico_projects')
-        .insert([ico])
-        .select()
-        .single();
-
+      const { data, error } = await icoProjectsAPI.create(icoData);
       if (error) throw error;
       setIcos(prev => [data, ...prev]);
     } catch (error) {
@@ -175,18 +122,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const addPropFirm = async (firm: Omit<PropFirm, 'id' | 'created_at' | 'updated_at'>) => {
+  const addPropFirm = async (firmData: Omit<PropFirm, 'id' | 'created_at' | 'updated_at'>) => {
     if (!isSupabaseConnected) {
       throw new Error('Database not connected. Please connect to Supabase first.');
     }
 
     try {
-      const { data, error } = await supabase
-        .from('prop_firms')
-        .insert([firm])
-        .select()
-        .single();
-
+      const { data, error } = await propFirmsAPI.create(firmData);
       if (error) throw error;
       setPropFirms(prev => [data, ...prev]);
     } catch (error) {
@@ -201,13 +143,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('crypto_tools')
-        .update({ ...updates, updated_at: new Date().toISOString() })
-        .eq('id', id)
-        .select()
-        .single();
-
+      const { data, error } = await cryptoToolsAPI.update(id, updates);
       if (error) throw error;
       setTools(prev => prev.map(tool => tool.id === id ? data : tool));
     } catch (error) {
@@ -222,13 +158,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('ico_projects')
-        .update({ ...updates, updated_at: new Date().toISOString() })
-        .eq('id', id)
-        .select()
-        .single();
-
+      const { data, error } = await icoProjectsAPI.update(id, updates);
       if (error) throw error;
       setIcos(prev => prev.map(ico => ico.id === id ? data : ico));
     } catch (error) {
@@ -243,13 +173,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('prop_firms')
-        .update({ ...updates, updated_at: new Date().toISOString() })
-        .eq('id', id)
-        .select()
-        .single();
-
+      const { data, error } = await propFirmsAPI.update(id, updates);
       if (error) throw error;
       setPropFirms(prev => prev.map(firm => firm.id === id ? data : firm));
     } catch (error) {
@@ -264,11 +188,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const { error } = await supabase
-        .from('crypto_tools')
-        .delete()
-        .eq('id', id);
-
+      const { error } = await cryptoToolsAPI.delete(id);
       if (error) throw error;
       setTools(prev => prev.filter(tool => tool.id !== id));
     } catch (error) {
@@ -283,11 +203,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const { error } = await supabase
-        .from('ico_projects')
-        .delete()
-        .eq('id', id);
-
+      const { error } = await icoProjectsAPI.delete(id);
       if (error) throw error;
       setIcos(prev => prev.filter(ico => ico.id !== id));
     } catch (error) {
@@ -302,11 +218,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const { error } = await supabase
-        .from('prop_firms')
-        .delete()
-        .eq('id', id);
-
+      const { error } = await propFirmsAPI.delete(id);
       if (error) throw error;
       setPropFirms(prev => prev.filter(firm => firm.id !== id));
     } catch (error) {
