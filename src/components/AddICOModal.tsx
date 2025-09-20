@@ -12,14 +12,14 @@ export default function AddICOModal({ onClose }: AddICOModalProps) {
     name: '',
     symbol: '',
     description: '',
-    start_date: '',
-    end_date: '',
+    startDate: '',
+    endDate: '',
     target: '',
     raised: '$0',
     participants: 0,
     rating: 4.0,
     category: 'DeFi',
-    icon_url: '',
+    iconUrl: '',
     status: 'upcoming' as 'upcoming' | 'active' | 'completed',
     website: '',
     whitepaper: '',
@@ -33,36 +33,25 @@ export default function AddICOModal({ onClose }: AddICOModalProps) {
   const categories = ['DeFi', 'Infrastructure', 'Gaming', 'NFT', 'Sustainability', 'Technology', 'Healthcare'];
   const statuses = ['upcoming', 'active', 'completed'];
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const icoData = {
+      ...formData,
+      website: formData.website || undefined,
+      whitepaper: formData.whitepaper || undefined,
+      social: Object.fromEntries(
+        Object.entries(formData.social).filter(([_, value]) => value.trim() !== '')
+      ),
+    };
     
-    try {
-      const icoData = {
-        name: formData.name,
-        symbol: formData.symbol,
-        description: formData.description,
-        start_date: formData.start_date,
-        end_date: formData.end_date,
-        target: formData.target,
-        raised: formData.raised,
-        participants: formData.participants,
-        rating: formData.rating,
-        category: formData.category,
-        icon_url: formData.icon_url || '',
-        status: formData.status,
-        website: formData.website || undefined,
-        whitepaper: formData.whitepaper || undefined,
-        social: Object.fromEntries(
-          Object.entries(formData.social).filter(([_, value]) => value.trim() !== '')
-        ),
-      };
-      
-      await addICO(icoData);
-      onClose();
-    } catch (error) {
-      console.error('Error adding ICO:', error);
-      alert('Error adding ICO. Please try again.');
-    }
+    addICO(icoData)
+      .then(() => {
+        onClose();
+      })
+      .catch((error) => {
+        console.error('Error adding ICO:', error);
+        alert('Error adding ICO. Please try again.');
+      });
   };
 
   return (
@@ -154,8 +143,8 @@ export default function AddICOModal({ onClose }: AddICOModalProps) {
               <input
                 type="url"
                 placeholder="https://example.com/logo.png"
-                value={formData.icon_url}
-                onChange={(e) => setFormData(prev => ({ ...prev, icon_url: e.target.value }))}
+                value={formData.iconUrl}
+                onChange={(e) => setFormData(prev => ({ ...prev, iconUrl: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -169,8 +158,8 @@ export default function AddICOModal({ onClose }: AddICOModalProps) {
               <input
                 type="date"
                 required
-                value={formData.start_date}
-                onChange={(e) => setFormData(prev => ({ ...prev, start_date: e.target.value }))}
+                value={formData.startDate}
+                onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -181,8 +170,8 @@ export default function AddICOModal({ onClose }: AddICOModalProps) {
               <input
                 type="date"
                 required
-                value={formData.end_date}
-                onChange={(e) => setFormData(prev => ({ ...prev, end_date: e.target.value }))}
+                value={formData.endDate}
+                onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>

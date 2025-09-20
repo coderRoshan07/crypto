@@ -12,38 +12,33 @@ export default function AddToolModal({ onClose }: AddToolModalProps) {
     name: '',
     description: '',
     category: 'Trading',
-    icon_url: '',
+    iconUrl: '',
     premium: false,
     rating: 4.0,
     url: '',
     affiliate_url: '',
+    commission: 0,
     features: [''],
   });
 
   const categories = ['Trading', 'Portfolio', 'Analysis', 'Security', 'Mining', 'DeFi'];
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const toolData = {
+      ...formData,
+      features: formData.features.filter(f => f.trim() !== ''),
+      affiliate_url: formData.affiliate_url || undefined,
+    };
     
-    try {
-      const toolData = {
-        name: formData.name,
-        description: formData.description,
-        category: formData.category,
-        icon_url: formData.icon_url || '',
-        premium: formData.premium,
-        rating: formData.rating,
-        url: formData.url,
-        affiliate_url: formData.affiliate_url || undefined,
-        features: formData.features.filter(f => f.trim() !== ''),
-      };
-      
-      await addTool(toolData);
-      onClose();
-    } catch (error) {
-      console.error('Error adding tool:', error);
-      alert('Error adding tool. Please try again.');
-    }
+    addTool(toolData)
+      .then(() => {
+        onClose();
+      })
+      .catch((error) => {
+        console.error('Error adding tool:', error);
+        alert('Error adding tool. Please try again.');
+      });
   };
 
   const addFeature = () => {
@@ -128,8 +123,8 @@ export default function AddToolModal({ onClose }: AddToolModalProps) {
               <input
                 type="url"
                 placeholder="https://example.com/favicon.ico"
-                value={formData.icon_url}
-                onChange={(e) => setFormData(prev => ({ ...prev, icon_url: e.target.value }))}
+                value={formData.iconUrl}
+                onChange={(e) => setFormData(prev => ({ ...prev, iconUrl: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>

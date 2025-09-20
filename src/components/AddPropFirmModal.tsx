@@ -10,13 +10,13 @@ export default function AddPropFirmModal({ onClose }: AddPropFirmModalProps) {
   const { addPropFirm } = useData();
   const [formData, setFormData] = useState({
     name: '',
-    icon_url: '',
+    iconUrl: '',
     description: '',
-    min_capital: '',
-    max_capital: '',
-    profit_split: '',
-    max_drawdown: '',
-    trading_period: '',
+    minCapital: '',
+    maxCapital: '',
+    profitSplit: '',
+    maxDrawdown: '',
+    tradingPeriod: '',
     challenge: true,
     instruments: ['Forex'],
     rating: 4.0,
@@ -25,41 +25,30 @@ export default function AddPropFirmModal({ onClose }: AddPropFirmModalProps) {
     offers: [''],
     highlights: [''],
     website: '',
-    affiliate_url: '',
+    affiliateUrl: '',
   });
 
   const availableInstruments = ['Forex', 'Indices', 'Commodities', 'Crypto', 'Stocks', 'Futures'];
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const firmData = {
+      ...formData,
+      features: formData.features.filter(f => f.trim() !== ''),
+      offers: formData.offers.filter(f => f.trim() !== ''),
+      highlights: formData.highlights.filter(f => f.trim() !== ''),
+      website: formData.website || undefined,
+      affiliateUrl: formData.affiliateUrl || undefined,
+    };
     
-    try {
-      const firmData = {
-        name: formData.name,
-        icon_url: formData.icon_url || '',
-        description: formData.description,
-        min_capital: formData.min_capital,
-        max_capital: formData.max_capital,
-        profit_split: formData.profit_split,
-        max_drawdown: formData.max_drawdown,
-        trading_period: formData.trading_period,
-        challenge: formData.challenge,
-        instruments: formData.instruments,
-        rating: formData.rating,
-        reviews: formData.reviews,
-        features: formData.features.filter(f => f.trim() !== ''),
-        offers: formData.offers.filter(f => f.trim() !== ''),
-        highlights: formData.highlights.filter(f => f.trim() !== ''),
-        website: formData.website || undefined,
-        affiliate_url: formData.affiliate_url || undefined,
-      };
-      
-      await addPropFirm(firmData);
-      onClose();
-    } catch (error) {
-      console.error('Error adding prop firm:', error);
-      alert('Error adding prop firm. Please try again.');
-    }
+    addPropFirm(firmData)
+      .then(() => {
+        onClose();
+      })
+      .catch((error) => {
+        console.error('Error adding prop firm:', error);
+        alert('Error adding prop firm. Please try again.');
+      });
   };
 
   const addFeature = () => {
@@ -165,8 +154,8 @@ export default function AddPropFirmModal({ onClose }: AddPropFirmModalProps) {
               <input
                 type="url"
                 placeholder="https://example.com/favicon.ico"
-                value={formData.icon_url}
-                onChange={(e) => setFormData(prev => ({ ...prev, icon_url: e.target.value }))}
+                value={formData.iconUrl}
+                onChange={(e) => setFormData(prev => ({ ...prev, iconUrl: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -189,56 +178,14 @@ export default function AddPropFirmModal({ onClose }: AddPropFirmModalProps) {
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Minimum Capital
-              </label>
-              <input
-                type="text"
-                required
-                placeholder="$10,000"
-                value={formData.min_capital}
-                onChange={(e) => setFormData(prev => ({ ...prev, min_capital: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Maximum Capital
-              </label>
-              <input
-                type="text"
-                required
-                placeholder="$400,000"
-                value={formData.max_capital}
-                onChange={(e) => setFormData(prev => ({ ...prev, max_capital: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Profit Split
-              </label>
-              <input
-                type="text"
-                required
-                placeholder="80%"
-                value={formData.profit_split}
-                onChange={(e) => setFormData(prev => ({ ...prev, profit_split: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Max Drawdown
               </label>
               <input
                 type="text"
                 required
                 placeholder="10%"
-                value={formData.max_drawdown}
-                onChange={(e) => setFormData(prev => ({ ...prev, max_drawdown: e.target.value }))}
+                value={formData.maxDrawdown}
+                onChange={(e) => setFormData(prev => ({ ...prev, maxDrawdown: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -250,8 +197,66 @@ export default function AddPropFirmModal({ onClose }: AddPropFirmModalProps) {
                 type="text"
                 required
                 placeholder="30 days"
-                value={formData.trading_period}
-                onChange={(e) => setFormData(prev => ({ ...prev, trading_period: e.target.value }))}
+                value={formData.tradingPeriod}
+                onChange={(e) => setFormData(prev => ({ ...prev, tradingPeriod: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Minimum Capital
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="$10,000"
+                value={formData.minCapital}
+                onChange={(e) => setFormData(prev => ({ ...prev, minCapital: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Maximum Capital
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="$400,000"
+                value={formData.maxCapital}
+                onChange={(e) => setFormData(prev => ({ ...prev, maxCapital: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Profit Split
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="80%"
+                value={formData.profitSplit}
+                onChange={(e) => setFormData(prev => ({ ...prev, profitSplit: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Monthly Target
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="10%"
+                value={formData.monthlyTarget}
+                onChange={(e) => setFormData(prev => ({ ...prev, monthlyTarget: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -335,8 +340,8 @@ export default function AddPropFirmModal({ onClose }: AddPropFirmModalProps) {
               </label>
               <input
                 type="url"
-                value={formData.affiliate_url}
-                onChange={(e) => setFormData(prev => ({ ...prev, affiliate_url: e.target.value }))}
+                value={formData.affiliateUrl}
+                onChange={(e) => setFormData(prev => ({ ...prev, affiliateUrl: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
